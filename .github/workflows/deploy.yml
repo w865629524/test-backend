@@ -1,0 +1,54 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.DEPLOY_ID_RSA }}
+          known_hosts: ${{ secrets.KNOWN_HOST }}
+          host: ${{ secrets.DEPLOY_SERVER_IP }}
+
+      - name: Deploy application
+        run: |
+          ssh ${{ secrets.SSH_HOST }} << 'ENDSSH'
+            mkdir -p ${{ vars.DEPLOY_APP_PATH }}
+            mkdir -p ${{ vars.DEPLOY_APP_LOG_PATH }}          
+            cd ${{ vars.DEPLOY_APP_PATH }} # 进入你的应用目录
+            sudo systemctl stop ${{ vars.DEPLOY_SERVICE_NAME }} # 停止现有服务
+            rm -rf * # 删除旧的应用程序文件
+            exit
+          ENDSSH
+          
+          scp target/*.jar ${{ secrets.SSH_HOST }}:${{ vars.DEPLOY_APP_PATH }}
+          
+          ssh ${{ secrets.SSH_HOST }} << 'ENDSSH'
+            cd ${{ vars.DEPLOY_APP_PATH }}
+            echo "SERVER_PORT=${{ vars.SERVER_PORT }}" > /home/zq/application.env
+            echo "APP_NAME=${{ vars.APP_NAME }}" >> /home/zq/application.env
+            echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> /home/zq/application.env
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> /home/zq/application.env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /home/zq/application.env
+            sudo systemctl start ${{ vars.DEPLOY_SERVICE_NAME }} # 启动服务]          
+            exit
+          ENDSSH

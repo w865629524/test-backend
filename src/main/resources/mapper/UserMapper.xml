@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zq.backend.dao.UserDao">
+
+    <!-- 插入用户 -->
+    <insert id="insertUser" parameterType="com.zq.backend.object.data.UserDO">
+        INSERT INTO `user` (username, password, email, role)
+        VALUES (#{userName}, #{password}, #{email}, #{role})
+    </insert>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="getByUserId" parameterType="Long" resultType="com.zq.backend.object.data.UserDO">
+        SELECT * FROM `user` WHERE id = #{id}
+    </select>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="getByUserName" parameterType="String" resultType="com.zq.backend.object.data.UserDO">
+        SELECT * FROM `user` WHERE username = #{userName}
+    </select>
+
+    <update id="updatePassword">
+        UPDATE user
+        SET password = #{newPassword}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper>
