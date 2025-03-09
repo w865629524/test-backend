@@ -49,7 +49,6 @@ jobs:
           ssh ${{ secrets.SSH_HOST }} << 'ENDSSH'
             cd ${{ vars.DEPLOY_APP_PATH }}
             echo "SERVER_PORT=${{ vars.SERVER_PORT }}" > /home/zq/application.env
-            echo "APP_NAME=${{ vars.APP_NAME }}" >> /home/zq/application.env
             echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> /home/zq/application.env
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> /home/zq/application.env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /home/zq/application.env
