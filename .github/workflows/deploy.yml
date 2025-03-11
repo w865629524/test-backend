@@ -53,7 +53,6 @@ jobs:
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> /home/zq/application.env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /home/zq/application.env
             echo "LOGGING_FILE_PATH=${{ vars.LOGGING_FILE_PATH }}" >> /home/zq/application.env
-            echo "KNOWN_HOST=${{ secrets.KNOWN_HOST }}" >> /home/zq/application.env
             sudo systemctl start ${{ vars.DEPLOY_SERVICE_NAME }} # 启动服务]          
             exit
           ENDSSH
