@@ -35,7 +35,7 @@ jobs:
 
       - name: Deploy application
         run: |
-          ssh ${{ secrets.SSH_HOST }} << 'ENDSSH'
+          ssh ${{ vars.SSH_HOST }} << 'ENDSSH'
             mkdir -p ${{ vars.DEPLOY_APP_PATH }}
             mkdir -p ${{ vars.DEPLOY_APP_LOG_PATH }}          
             cd ${{ vars.DEPLOY_APP_PATH }} # 进入你的应用目录
@@ -44,14 +44,16 @@ jobs:
             exit
           ENDSSH
           
-          scp target/*.jar ${{ secrets.SSH_HOST }}:${{ vars.DEPLOY_APP_PATH }}
+          scp target/*.jar ${{ vars.SSH_HOST }}:${{ vars.DEPLOY_APP_PATH }}
           
-          ssh ${{ secrets.SSH_HOST }} << 'ENDSSH'
+          ssh ${{ vars.SSH_HOST }} << 'ENDSSH'
             cd ${{ vars.DEPLOY_APP_PATH }}
             echo "SERVER_PORT=${{ vars.SERVER_PORT }}" > /home/zq/application.env
-            echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> /home/zq/application.env
+            echo "DATASOURCE_URL=${{ vars.DATASOURCE_URL }}" >> /home/zq/application.env
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> /home/zq/application.env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /home/zq/application.env
+            echo "LOGGING_FILE_PATH=${{ vars.LOGGING_FILE_PATH }}" >> /home/zq/application.env
+            echo "KNOWN_HOST=${{ secrets.KNOWN_HOST }}" >> /home/zq/application.env
             sudo systemctl start ${{ vars.DEPLOY_SERVICE_NAME }} # 启动服务]          
             exit
           ENDSSH
