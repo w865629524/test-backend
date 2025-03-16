@@ -47,12 +47,34 @@ jobs:
           scp target/*.jar ${{ vars.SSH_HOST }}:${{ vars.DEPLOY_APP_PATH }}
           
           ssh ${{ vars.SSH_HOST }} << 'ENDSSH'
+
+            # 检查文件是否存在，如果不存在则创建
+            if [ ! -f ${{ vars.APPLICATION_ENV_PATH }} ]; then
+            echo "Creating application.env file..."
+            touch ${{ vars.APPLICATION_ENV_PATH }}
+            fi
+
             cd ${{ vars.DEPLOY_APP_PATH }}
-            echo "SERVER_PORT=${{ vars.SERVER_PORT }}" > /home/zq/application.env
-            echo "DATASOURCE_URL=${{ vars.DATASOURCE_URL }}" >> /home/zq/application.env
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> /home/zq/application.env
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /home/zq/application.env
-            echo "LOGGING_FILE_PATH=${{ vars.LOGGING_FILE_PATH }}" >> /home/zq/application.env
-            sudo systemctl start ${{ vars.DEPLOY_SERVICE_NAME }} # 启动服务]          
+            echo "SERVER_PORT=${{ vars.SERVER_PORT }}" > ${{ vars.APPLICATION_ENV_PATH }}
+            echo "DATASOURCE_URL=${{ vars.DATASOURCE_URL }}" >> ${{ vars.APPLICATION_ENV_PATH }}
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> ${{ vars.APPLICATION_ENV_PATH }}
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> ${{ vars.APPLICATION_ENV_PATH }}
+            echo "LOGGING_FILE_PATH=${{ vars.LOGGING_FILE_PATH }}" >> ${{ vars.APPLICATION_ENV_PATH }}
+            
+            # 启动服务
+            sudo systemctl start ${{ vars.DEPLOY_SERVICE_NAME }}
+          
+            # 检查服务是否成功启动
+            sleep 5 # 等待服务启动完成
+            if sudo systemctl is-active --quiet ${{ vars.DEPLOY_SERVICE_NAME }}; then
+            echo "Service started successfully."
+            # 删除 application.env 文件
+            rm -f ${{ vars.APPLICATION_ENV_PATH }}
+            echo "Deleted application.env file."
+            else
+            echo "Failed to start service. Keeping application.env for debugging."
+            exit 1
+            fi
+          
             exit
           ENDSSH
