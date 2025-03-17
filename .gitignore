@@ -2,3 +2,5 @@
 /target/
 /backend.iml
 *.http
+/logs/
+接口文档.md
