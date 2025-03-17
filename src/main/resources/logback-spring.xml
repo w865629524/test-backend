@@ -89,7 +89,7 @@
         <appender-ref ref="SERVICE_LOG"/>
     </logger>
 
-    <logger name="com.zq.backend.service" level="INFO" additivity="false">
+    <logger name="COMMON_LOGGER" level="INFO" additivity="false">
         <appender-ref ref="COMMON_LOG"/>
     </logger>
 

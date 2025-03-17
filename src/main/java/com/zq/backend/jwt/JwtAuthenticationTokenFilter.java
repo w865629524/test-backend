@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,7 +21,7 @@ import java.util.Objects;
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Resource
-    private UserDetailsService  userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
@@ -34,12 +33,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         String token = request.getHeader(Constant.JWT_HEADER_KEY);
         if (Objects.nonNull(token) && token.startsWith(Constant.JWT_TOKEN_PREFIX)) {
             token = token.substring(Constant.JWT_TOKEN_PREFIX.length());
-            Claims claims = JwtUtil.parseJWT(token);
+            Claims claims = JwtUtil.parseToken(token);
             if(Objects.nonNull(claims)) {
-                String userName = claims.getSubject();
-                if (Objects.nonNull(userName)) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-                    if(Objects.nonNull(userDetails)) {
+                String username = claims.getSubject();
+                if (Objects.nonNull(username)) {
+                    CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+                    if(Objects.nonNull(userDetails) && Objects.equals(claims.get(Constant.JWT_VERSION_KEY, Integer.class),  userDetails.getJwtVersion())) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }

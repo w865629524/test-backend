@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zq.backend.dao.UserDAO">
+    <sql id="all_fields">
+        id, username, password, avator, email, nick, phone, address, role, extension, created_at, updated_at
+    </sql>
+    <sql id="insert_fields">
+        username, password, avator, email, nick, phone, address, role, extension
+    </sql>
+
+    <!-- 插入用户 -->
+    <insert id="insertUser" parameterType="com.zq.backend.object.data.UserDO">
+        INSERT INTO `user` (<include refid="insert_fields"/>)
+        VALUES (#{username}, #{password}, #{avator}, #{email}, #{nick}, #{phone}, #{address}, #{role}, #{extension})
+    </insert>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="getByUserName" parameterType="String" resultType="com.zq.backend.object.data.UserDO">
+        SELECT <include refid="all_fields"/> FROM `user` WHERE username = #{username}
+    </select>
+
+    <update id="updateUser" parameterType="com.zq.backend.object.data.UserDO">
+        UPDATE user
+        SET updated_at = NOW()
+        <if test="avator">
+            ,avator = #{avator}
+        </if>
+        <if test="nick">
+            ,nick = #{nick}
+        </if>
+        <if test="email">
+            ,email = #{email}
+        </if>
+        <if test="phone">
+            ,phone = #{phone}
+        </if>
+        <if test="address">
+            ,address = #{address}
+        </if>
+        WHERE username = #{username}
+    </update>
+
+    <update id="updateExtension">
+        UPDATE user
+        SET updated_at = NOW(), extension = JSON_MERGE_PATCH(IFNULL(extension, '{}'), #{extension})
+        WHERE username = #{username}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE user
+        SET updated_at = NOW(), password = #{password}
+        WHERE username = #{username}
+    </update>
+</mapper>

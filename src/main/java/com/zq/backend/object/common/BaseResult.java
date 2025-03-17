@@ -3,10 +3,14 @@ package com.zq.backend.object.common;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import java.io.Serial;
+import java.io.Serializable;
 
 @Data
-public class BaseResult<T> {
+public class BaseResult<T> implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 6129878671081694717L;
 
     private boolean success;
     private String errorCode;

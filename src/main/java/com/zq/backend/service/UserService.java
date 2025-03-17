@@ -1,70 +1,24 @@
 package com.zq.backend.service;
 
-import com.zq.backend.converter.DTOConverter;
-import com.zq.backend.dao.UserDao;
-import com.zq.backend.jwt.JwtUtil;
-import com.zq.backend.object.common.ErrorEnum;
-import com.zq.backend.object.common.ExceptionUtil;
-import com.zq.backend.object.common.ParamChecker;
-import com.zq.backend.object.data.UserDO;
-import com.zq.backend.object.dto.UserDTO;
-import com.zq.backend.repository.UserRepository;
-import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
+import com.zq.backend.object.params.LoginParam;
+import com.zq.backend.object.params.RegisterPararm;
+import com.zq.backend.object.params.UpdateUserParam;
+import com.zq.backend.object.params.UpdateUserPasswordParam;
+import com.zq.backend.object.results.LoginResult;
+import com.zq.backend.object.vo.BaseUserVO;
+import com.zq.backend.object.vo.UserVO;
 
-import java.util.Objects;
+public interface UserService {
 
-@Service
-public class UserService {
+    LoginResult create(RegisterPararm param);
 
-    @Autowired
-    private UserDao userDao;
+    LoginResult doLogin(LoginParam param);
 
-    @Resource
-    private UserRepository userRepository;
+    Void doLogout(String username);
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    UserVO updateUser(UpdateUserParam param, String username);
 
-    public String create(UserDTO userDTO) {
-        userRepository.create(userDTO);
-        UserDTO createdUser = userRepository.getByUserName(userDTO.getUserName());
-        if(Objects.isNull(createdUser)) {
-            ExceptionUtil.throwException(ErrorEnum.UNKNOWN_ERROR);
-        }
-        return doLogin(userDTO.getUserName(), userDTO.getPassword());
-    }
+    BaseUserVO updatePassword(UpdateUserPasswordParam param, String username);
 
-    public String doLogin(String userName, String password) {
-        ParamChecker.checkNotNull(userName, "userName");
-        ParamChecker.checkNotNull(password, "password");
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-        Authentication authentication = authenticationManager.authenticate(token);
-        if(!authentication.isAuthenticated()) {
-            ExceptionUtil.throwException(ErrorEnum.WRONG_PASSWORD);
-        }
-        String jwt = JwtUtil.createJWT(authentication.getName());
-        return jwt;
-    }
-
-    public boolean changePassword(Long userId, String oldPassword, String newPassword) {
-        return userRepository.updatePassword(userId, oldPassword, newPassword);
-    }
-
-    public UserDTO getByUserName(String userName) {
-        UserDO userDO = userDao.getByUserName(userName);
-        return DTOConverter.INSTANCE.fromUserDO(userDO);
-    }
-
-    public UserDTO getUserInfo(Long userId) {
-        UserDO userDO = userDao.getByUserId(userId);
-        if(Objects.isNull(userDO)) {
-            ExceptionUtil.throwException(ErrorEnum.USER_NOT_EXISTS);
-        }
-        return DTOConverter.INSTANCE.fromUserDO(userDO);
-    }
+    UserVO getUserInfo(String username);
 }
