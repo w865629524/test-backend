@@ -47,19 +47,10 @@ public class AuthAspect {
             return BaseResult.getFailedResult(ErrorEnum.NEED_LOGIN);
         }
 
-        // 校验用户名是否匹配
-        UserDTO authUser = userRepository.getByUserName(authentication.getName());
-        boolean checkUsername = Optional.of(authAnnotation).map(Auth::checkUsername).orElse(false);
-        if(checkUsername) {
-            String username = extractUsername(pjp.getArgs());
-            if(StringUtils.isBlank(username) || !Objects.equals(authUser.getUsername(), username)) {
-                return BaseResult.getFailedResult(ErrorEnum.LOGIN_ERROR);
-            }
-        }
-
         // 校验权限是否匹配
+        UserDTO authUser = userRepository.getByUserName(authentication.getName());
         RoleTypeEnum requireRole = authAnnotation.requireRole();
-        if(Objects.nonNull(requireRole) && requireRole.getWeight() < authUser.getRole().getWeight()) {
+        if(Objects.nonNull(requireRole) && requireRole.getWeight() > authUser.getRole().getWeight()) {
             return BaseResult.getFailedResult(ErrorEnum.NO_PERMISSION);
         }
 

@@ -13,7 +13,7 @@ public enum ErrorEnum {
     NO_PERMISSION("10003", "权限不足"),
     USER_EXISTS("10004", "用户已存在"),
     USER_NOT_EXISTS("10005", "用户不存在"),
-    WRONG_PASSWORD("10006", "密码错误"),
+    WRONG_PASSWORD("10006", "用户名或密码错误"),
     UNSAFE_PASSWORD("10007", "不安全的密码"),
     ILLEGAL_USERNAME("10008", "用户名非法"),
     UNKNOWN_ERROR("99999", "未知错误"),

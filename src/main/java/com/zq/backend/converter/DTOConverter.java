@@ -7,11 +7,14 @@ import com.zq.backend.object.dto.UserDTOWithPassword;
 import com.zq.backend.object.dto.UserExtension;
 import com.zq.backend.object.vo.UserVO;
 import org.mapstruct.AfterMapping;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
 import java.util.Objects;
 
 @Mapper
@@ -20,7 +23,11 @@ public interface DTOConverter {
 
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "extension", ignore = true)
+    @Named("toUserDTO")
     UserDTO toUserDTO(UserDO userDO);
+
+    @IterableMapping(qualifiedByName = "toUserDTO")
+    List<UserDTO> toUserDTOList(List<UserDO> userDOList);
 
     @AfterMapping
     default void afterMapping(@MappingTarget UserDTO userDTO, UserDO userDO) {
@@ -33,6 +40,7 @@ public interface DTOConverter {
 
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "extension", ignore = true)
+    @Named("toUserDTOWithPassword")
     UserDTOWithPassword toUserDTOWithPassword(UserDO userDO);
 
     @AfterMapping
@@ -43,6 +51,4 @@ public interface DTOConverter {
         userDTO.setRole(RoleTypeEnum.parse(userDO.getRole()));
         userDTO.setExtension(UserExtension.parse(userDO.getExtension()));
     }
-
-    UserDTO fromUserVO(UserVO userVO);
 }

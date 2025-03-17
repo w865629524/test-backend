@@ -14,6 +14,8 @@ import com.zq.backend.object.data.UserDO;
 import com.zq.backend.object.dto.UserDTO;
 import com.zq.backend.object.dto.UserDTOWithPassword;
 import com.zq.backend.object.dto.UserExtension;
+import com.zq.backend.object.params.AddAdminParam;
+import com.zq.backend.object.params.ListUserParam;
 import com.zq.backend.object.params.LoginParam;
 import com.zq.backend.object.params.RegisterPararm;
 import com.zq.backend.object.params.UpdateUserParam;
@@ -32,14 +34,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-
-    @Autowired
-    private UserDAO userDao;
 
     @Resource
     private UserRepository userRepository;
@@ -149,5 +149,28 @@ public class UserServiceImpl implements UserService {
     public UserVO getUserInfo(String username) {
         UserDTO userDTO = userRepository.getByUserName(username);
         return VOConverter.INSTANCE.toUserVO(userDTO);
+    }
+
+    @Override
+    public List<UserVO> listUser(ListUserParam param) {
+        List<UserDTO> userDTOList = userRepository.listUser(param);
+        return VOConverter.INSTANCE.toUserVOList(userDTOList);
+    }
+
+    @Override
+    public Void addAdmin(AddAdminParam param) {
+        UserDTO userDTO = userRepository.getByUserName(param.getNewAdminUsername());
+        if(Objects.isNull(userDTO)) {
+            ExceptionUtil.throwException(ErrorEnum.USER_NOT_EXISTS);
+        }
+        if(RoleTypeEnum.ADMIN.getWeight() <= userDTO.getRole().getWeight()) {
+            return null;
+        }
+        int updated = userRepository.updateRole(userDTO.getUsername(), RoleTypeEnum.ADMIN);
+        if(updated <= 0) {
+            log.error("[UserServiceImpl][addAdmin][logMsg: update failed][param:{}]", JSON.toJSONString(param));
+            ExceptionUtil.throwException(ErrorEnum.UNKNOWN_ERROR);
+        }
+        return null;
     }
 }

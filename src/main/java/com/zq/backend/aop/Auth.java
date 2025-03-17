@@ -12,6 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Auth {
     boolean needLogin() default true;
-    boolean checkUsername() default true;
     RoleTypeEnum requireRole() default RoleTypeEnum.USER;
 }

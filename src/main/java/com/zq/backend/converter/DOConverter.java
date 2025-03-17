@@ -26,7 +26,7 @@ public interface DOConverter {
             return;
         }
         if(Objects.nonNull(userDTO.getRole())) {
-            userDO.setRole(userDTO.getRole().getName());
+            userDO.setRole(userDTO.getRole().getRoleName());
         }
         if(Objects.nonNull(userDTO.getExtension())) {
             userDO.setExtension(JSON.toJSONString(userDTO.getExtension()));

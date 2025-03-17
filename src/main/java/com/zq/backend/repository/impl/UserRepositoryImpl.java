@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.zq.backend.converter.DOConverter;
 import com.zq.backend.converter.DTOConverter;
 import com.zq.backend.dao.UserDAO;
+import com.zq.backend.object.RoleTypeEnum;
 import com.zq.backend.object.common.ErrorEnum;
 import com.zq.backend.object.common.ExceptionUtil;
 import com.zq.backend.object.common.ParamChecker;
@@ -11,6 +12,7 @@ import com.zq.backend.object.data.UserDO;
 import com.zq.backend.object.dto.UserDTO;
 import com.zq.backend.object.dto.UserDTOWithPassword;
 import com.zq.backend.object.dto.UserExtension;
+import com.zq.backend.object.params.ListUserParam;
 import com.zq.backend.repository.UserRepository;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +20,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Objects;
 
 @Repository
@@ -80,6 +83,19 @@ public class UserRepositoryImpl implements UserRepository {
         ParamChecker.checkNotBlank(username, "username");
         ParamChecker.checkNotBlank(encodedPassword, "password");
         return userDAO.updatePassword(username, encodedPassword);
+    }
+
+    @Override
+    public List<UserDTO> listUser(ListUserParam param) {
+        ParamChecker.checkNotNull(param, "param");
+        return DTOConverter.INSTANCE.toUserDTOList(userDAO.listUser(param));
+    }
+
+    @Override
+    public int updateRole(String username, RoleTypeEnum roleTypeEnum) {
+        ParamChecker.checkNotBlank(username, "username");
+        ParamChecker.checkNotNull(roleTypeEnum, "roleType");
+        return userDAO.updateRole(username, roleTypeEnum.getRoleName());
     }
 
     @Cacheable(value=CACHE_NAME, key="#username")

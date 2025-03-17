@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
 import java.util.Objects;
 
 @Mapper
@@ -16,6 +17,8 @@ public interface VOConverter {
 
     UserVO toUserVO(UserDTO userDTO);
 
+    List<UserVO> toUserVOList(List<UserDTO> userDTOList);
+
     @AfterMapping
     default void afterMapping(@MappingTarget UserVO userVO, UserDTO userDTO) {
         if(Objects.isNull(userDTO)) {
@@ -23,4 +26,5 @@ public interface VOConverter {
         }
         userVO.setIsAdmin(RoleTypeEnum.ADMIN.equals(userDTO.getRole()));
     }
+
 }

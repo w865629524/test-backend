@@ -22,19 +22,19 @@
     <update id="updateUser" parameterType="com.zq.backend.object.data.UserDO">
         UPDATE user
         SET updated_at = NOW()
-        <if test="avator">
+        <if test="avator != null">
             ,avator = #{avator}
         </if>
-        <if test="nick">
+        <if test="nick != null">
             ,nick = #{nick}
         </if>
-        <if test="email">
+        <if test="email != null">
             ,email = #{email}
         </if>
-        <if test="phone">
+        <if test="phone != null">
             ,phone = #{phone}
         </if>
-        <if test="address">
+        <if test="address != null">
             ,address = #{address}
         </if>
         WHERE username = #{username}
@@ -49,6 +49,36 @@
     <update id="updatePassword">
         UPDATE user
         SET updated_at = NOW(), password = #{password}
+        WHERE username = #{username}
+    </update>
+
+    <select id="listUser" parameterType="com.zq.backend.object.params.ListUserParam" resultType="com.zq.backend.object.data.UserDO">
+        SELECT <include refid="all_fields"/>
+        FROM `user`
+        WHERE 1=1
+        <if test="nick != null">
+            and nick like CONCAT('%', #{nick}, '%')
+        </if>
+        <if test="email != null">
+            and email like CONCAT('%', #{email}, '%')
+        </if>
+        <if test="phone != null">
+            and phone like CONCAT('%', #{phone}, '%')
+        </if>
+        <if test="address != null">
+            and address like CONCAT('%', #{address}, '%')
+        </if>
+        <if test="isAdmin == true">
+            and role in ("admin")
+        </if>
+        <if test="isAdmin == false">
+            and role not in ("admin")
+        </if>
+    </select>
+
+    <update id="updateRole">
+        UPDATE user
+        SET updated_at = NOW(), role = #{role}
         WHERE username = #{username}
     </update>
 </mapper>

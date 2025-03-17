@@ -14,12 +14,12 @@ public enum RoleTypeEnum {
     ADMIN("admin", 10),
     ;
 
-    private final String name;
+    private final String roleName;
     private final Integer weight;
 
     public static RoleTypeEnum parse(String role) {
         for (RoleTypeEnum type : RoleTypeEnum.values()) {
-            if (type.getName().equals(role)) {
+            if (type.getRoleName().equals(role)) {
                 return type;
             }
         }
