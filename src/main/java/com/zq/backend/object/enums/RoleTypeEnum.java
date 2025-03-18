@@ -1,4 +1,4 @@
-package com.zq.backend.object;
+package com.zq.backend.object.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

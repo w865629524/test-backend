@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.zq.backend.converter.DOConverter;
 import com.zq.backend.converter.DTOConverter;
 import com.zq.backend.dao.UserDAO;
-import com.zq.backend.object.RoleTypeEnum;
+import com.zq.backend.object.enums.RoleTypeEnum;
 import com.zq.backend.object.common.ErrorEnum;
 import com.zq.backend.object.common.ExceptionUtil;
 import com.zq.backend.object.common.ParamChecker;
@@ -42,7 +42,7 @@ public class UserRepositoryImpl implements UserRepository {
             userDTO.setExtension(new UserExtension());
         }
 
-        UserDO existingUser = getUserDO(userDTO.getUsername());
+        UserDO existingUser = getUserDOIgnoreStatus(userDTO.getUsername());
         if (Objects.nonNull(existingUser)) {
             ExceptionUtil.throwException(ErrorEnum.USER_EXISTS);
         }
@@ -102,5 +102,11 @@ public class UserRepositoryImpl implements UserRepository {
     public UserDO getUserDO(String username) {
         ParamChecker.checkNotBlank(username, "username");
         return userDAO.getByUserName(username);
+    }
+
+    @Cacheable(value=CACHE_NAME, key="#username")
+    public UserDO getUserDOIgnoreStatus(String username) {
+        ParamChecker.checkNotBlank(username, "username");
+        return userDAO.getByUserNameIgnoreStatus(username);
     }
 }

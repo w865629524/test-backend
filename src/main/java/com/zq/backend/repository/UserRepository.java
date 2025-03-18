@@ -1,6 +1,6 @@
 package com.zq.backend.repository;
 
-import com.zq.backend.object.RoleTypeEnum;
+import com.zq.backend.object.enums.RoleTypeEnum;
 import com.zq.backend.object.data.UserDO;
 import com.zq.backend.object.dto.UserDTO;
 import com.zq.backend.object.dto.UserDTOWithPassword;

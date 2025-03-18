@@ -1,12 +1,11 @@
 package com.zq.backend.aop;
 
-import com.zq.backend.object.RoleTypeEnum;
+import com.zq.backend.object.enums.RoleTypeEnum;
 import com.zq.backend.object.common.BaseResult;
 import com.zq.backend.object.common.ErrorEnum;
 import com.zq.backend.object.dto.UserDTO;
 import com.zq.backend.repository.UserRepository;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

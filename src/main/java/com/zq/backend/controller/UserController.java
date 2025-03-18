@@ -1,7 +1,7 @@
 package com.zq.backend.controller;
 
 import com.zq.backend.aop.Auth;
-import com.zq.backend.object.RoleTypeEnum;
+import com.zq.backend.object.enums.RoleTypeEnum;
 import com.zq.backend.object.common.BaseResult;
 import com.zq.backend.object.params.AddAdminParam;
 import com.zq.backend.object.params.ListUserParam;

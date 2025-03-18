@@ -2,21 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zq.backend.dao.UserDAO">
     <sql id="all_fields">
-        id, username, password, avator, email, nick, phone, address, role, extension, created_at, updated_at
+        id, username, password, status, avator, email, nick, phone, address, role, extension, created_at, updated_at
     </sql>
     <sql id="insert_fields">
-        username, password, avator, email, nick, phone, address, role, extension
+        username, password, status, avator, email, nick, phone, address, role, extension
     </sql>
 
     <!-- 插入用户 -->
     <insert id="insertUser" parameterType="com.zq.backend.object.data.UserDO">
         INSERT INTO `user` (<include refid="insert_fields"/>)
-        VALUES (#{username}, #{password}, #{avator}, #{email}, #{nick}, #{phone}, #{address}, #{role}, #{extension})
+        VALUES (#{username}, #{password}, #{status}, #{avator}, #{email}, #{nick}, #{phone}, #{address}, #{role}, #{extension})
     </insert>
 
     <!-- 根据用户名查询用户 -->
     <select id="getByUserName" parameterType="String" resultType="com.zq.backend.object.data.UserDO">
-        SELECT <include refid="all_fields"/> FROM `user` WHERE username = #{username}
+        SELECT <include refid="all_fields"/>
+        FROM `user`
+        WHERE username = #{username}
+        AND status = 0
+    </select>
+
+    <select id="getByUserNameIgnoreStatus" parameterType="String" resultType="com.zq.backend.object.data.UserDO">
+        SELECT <include refid="all_fields"/>
+        FROM `user`
+        WHERE username = #{username}
     </select>
 
     <update id="updateUser" parameterType="com.zq.backend.object.data.UserDO">
@@ -38,24 +47,27 @@
             ,address = #{address}
         </if>
         WHERE username = #{username}
+        AND status = 0
     </update>
 
     <update id="updateExtension">
         UPDATE user
         SET updated_at = NOW(), extension = JSON_MERGE_PATCH(IFNULL(extension, '{}'), #{extension})
         WHERE username = #{username}
+        AND status = 0
     </update>
 
     <update id="updatePassword">
         UPDATE user
         SET updated_at = NOW(), password = #{password}
         WHERE username = #{username}
+        AND status = 0
     </update>
 
     <select id="listUser" parameterType="com.zq.backend.object.params.ListUserParam" resultType="com.zq.backend.object.data.UserDO">
         SELECT <include refid="all_fields"/>
         FROM `user`
-        WHERE 1=1
+        WHERE status = 0
         <if test="nick != null">
             and nick like CONCAT('%', #{nick}, '%')
         </if>
@@ -69,9 +81,11 @@
             and address like CONCAT('%', #{address}, '%')
         </if>
         <if test="isAdmin == true">
+            <!--@ignoreSql-->
             and role in ("admin")
         </if>
         <if test="isAdmin == false">
+            <!--@ignoreSql-->
             and role not in ("admin")
         </if>
     </select>
@@ -80,5 +94,6 @@
         UPDATE user
         SET updated_at = NOW(), role = #{role}
         WHERE username = #{username}
+        AND status = 0
     </update>
 </mapper>

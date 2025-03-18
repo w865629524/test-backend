@@ -1,7 +1,7 @@
 package com.zq.backend.aop;
 
 
-import com.zq.backend.object.RoleTypeEnum;
+import com.zq.backend.object.enums.RoleTypeEnum;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

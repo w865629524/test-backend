@@ -4,9 +4,8 @@ import com.alibaba.fastjson2.JSON;
 import com.zq.backend.converter.DOConverter;
 import com.zq.backend.converter.ParamConverter;
 import com.zq.backend.converter.VOConverter;
-import com.zq.backend.dao.UserDAO;
 import com.zq.backend.jwt.JwtUtil;
-import com.zq.backend.object.RoleTypeEnum;
+import com.zq.backend.object.enums.RoleTypeEnum;
 import com.zq.backend.object.common.BaseException;
 import com.zq.backend.object.common.ErrorEnum;
 import com.zq.backend.object.common.ExceptionUtil;
@@ -56,7 +55,6 @@ public class UserServiceImpl implements UserService {
         UserDTOWithPassword userDTO = ParamConverter.INSTANCE.toUserDTOWithPassword(param);
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
         userDTO.setPassword(encodedPassword);
-        userDTO.setRole(RoleTypeEnum.USER);
         userRepository.create(userDTO);
 
         // 查询用户

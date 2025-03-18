@@ -9,6 +9,7 @@ public class UserDO {
     private Long id;
     private String username;
     private String password;
+    private Integer status;
     private String avator;
     private String nick;
     private String email;

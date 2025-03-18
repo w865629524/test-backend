@@ -1,6 +1,7 @@
 package com.zq.backend.object.dto;
 
-import com.zq.backend.object.RoleTypeEnum;
+import com.zq.backend.object.enums.RoleTypeEnum;
+import com.zq.backend.object.enums.UserStatusEnum;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
 public class UserDTO {
     private Long id;
     private String username;
+    private UserStatusEnum status;
     private String avator;
     private String nick;
     private String email;
