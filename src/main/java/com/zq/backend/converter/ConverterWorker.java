@@ -29,7 +29,7 @@ public class ConverterWorker {
         if (Objects.isNull(str)) {
             return null;
         }
-        return RoleTypeEnum.valueOf(str);
+        return RoleTypeEnum.parse(str);
     }
 
     @Named("checkIsAdmin")
