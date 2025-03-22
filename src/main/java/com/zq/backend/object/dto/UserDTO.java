@@ -11,11 +11,9 @@ public class UserDTO {
     private Long id;
     private String username;
     private UserStatusEnum status;
-    private String avator;
+    private String avatar;
     private String nick;
     private String email;
-    private String phone;
-    private String address;
     private RoleTypeEnum role;
     private UserExtension extension;
     private Date createdAt;

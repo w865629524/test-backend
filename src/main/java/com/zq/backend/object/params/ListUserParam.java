@@ -14,8 +14,6 @@ public class ListUserParam extends BaseParam implements Serializable {
 
     private String nick;
     private String email;
-    private String phone;
-    private String address;
     private Boolean isAdmin;
 
     @Override

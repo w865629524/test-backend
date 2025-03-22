@@ -10,7 +10,6 @@ import com.zq.backend.object.params.RegisterPararm;
 import com.zq.backend.object.params.UpdateUserParam;
 import com.zq.backend.object.params.UpdateUserPasswordParam;
 import com.zq.backend.object.results.LoginResult;
-import com.zq.backend.object.vo.BaseUserVO;
 import com.zq.backend.object.vo.UserVO;
 import com.zq.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +54,7 @@ public class UserController extends BaseController {
 
     @Auth(requireRole = RoleTypeEnum.USER)
     @PostMapping("/update/password")
-    public BaseResult<BaseUserVO> updatePassword(@RequestBody UpdateUserPasswordParam param) {
+    public BaseResult<LoginResult> updatePassword(@RequestBody UpdateUserPasswordParam param) {
         return doHandle(() -> userService.updatePassword(param, getUsername()));
     }
 

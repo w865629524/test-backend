@@ -7,7 +7,6 @@ import com.zq.backend.object.params.RegisterPararm;
 import com.zq.backend.object.params.UpdateUserParam;
 import com.zq.backend.object.params.UpdateUserPasswordParam;
 import com.zq.backend.object.results.LoginResult;
-import com.zq.backend.object.vo.BaseUserVO;
 import com.zq.backend.object.vo.UserVO;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public interface UserService {
 
     UserVO updateUser(UpdateUserParam param, String username);
 
-    BaseUserVO updatePassword(UpdateUserPasswordParam param, String username);
+    LoginResult updatePassword(UpdateUserPasswordParam param, String username);
 
     UserVO getUserInfo(String username);
 

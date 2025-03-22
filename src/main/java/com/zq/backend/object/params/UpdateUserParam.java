@@ -13,10 +13,8 @@ public class UpdateUserParam extends BaseParam implements Serializable {
     private static final long serialVersionUID = 1900766834924266450L;
 
     private String newNick;
-    private String newAvator;
+    private String newAvatar;
     private String newEmail;
-    private String newPhone;
-    private String newAddress;
 
     @Override
     public void checkAndRevise() {

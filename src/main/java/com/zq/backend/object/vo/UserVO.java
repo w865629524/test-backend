@@ -1,18 +1,18 @@
 package com.zq.backend.object.vo;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserVO extends BaseUserVO implements Serializable {
+public class UserVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 4906375610910231517L;
 
+    private String username;
+    private String avatar;
+    private String nick;
+    private Boolean isAdmin;
     private String email;
-    private String phone;
-    private String address;
 }

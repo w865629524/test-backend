@@ -16,11 +16,9 @@ public interface DOConverter {
     @Mapping(target = "extension", source = "extension", qualifiedByName = "toNotEmptyJsonString")
     UserDO toUserDO(UserDTOWithPassword userDTO);
 
-    @Mapping(target = "avator", source = "param.newAvator")
+    @Mapping(target = "avatar", source = "param.getNewAvatar")
     @Mapping(target = "nick", source = "param.newNick")
     @Mapping(target = "email", source = "param.newEmail")
-    @Mapping(target = "phone", source = "param.newPhone")
-    @Mapping(target = "address", source = "param.newAddress")
     @Mapping(target = "username", source = "username")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)

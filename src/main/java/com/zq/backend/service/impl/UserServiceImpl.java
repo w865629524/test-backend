@@ -20,7 +20,6 @@ import com.zq.backend.object.params.RegisterPararm;
 import com.zq.backend.object.params.UpdateUserParam;
 import com.zq.backend.object.params.UpdateUserPasswordParam;
 import com.zq.backend.object.results.LoginResult;
-import com.zq.backend.object.vo.BaseUserVO;
 import com.zq.backend.object.vo.UserVO;
 import com.zq.backend.repository.UserRepository;
 import com.zq.backend.service.UserService;
@@ -132,15 +131,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public BaseUserVO updatePassword(UpdateUserPasswordParam param, String username) {
-        UserDTOWithPassword userDTO = userRepository.getWithPasswordByUserName(username);
-        if(!passwordEncoder.matches(param.getOldPassword(), userDTO.getPassword())) {
+    public LoginResult updatePassword(UpdateUserPasswordParam param, String username) {
+        // 检查老密码是否匹配
+        UserDTOWithPassword userDTOWithPassword = userRepository.getWithPasswordByUserName(username);
+        if(!passwordEncoder.matches(param.getOldPassword(), userDTOWithPassword.getPassword())) {
             ExceptionUtil.throwException(ErrorEnum.WRONG_PASSWORD);
         }
         String encodedPassword = passwordEncoder.encode(param.getNewPassword());
         userRepository.updatePassword(username, encodedPassword);
         doLogout(username);
-        return null;
+
+        UserDTO userDTO = userRepository.getByUserName(username);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, param.getNewPassword());
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        UserExtension extension = userDTO.getExtension();
+        String token = JwtUtil.createToken(authentication.getName(), extension.getJwtVersion());
+
+        LoginResult loginResult = new LoginResult();
+        loginResult.setToken(token);
+        loginResult.setUserInfo(VOConverter.INSTANCE.toUserVO(userDTO));
+        return loginResult;
     }
 
     @Override

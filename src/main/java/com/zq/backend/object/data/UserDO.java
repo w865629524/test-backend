@@ -10,11 +10,9 @@ public class UserDO {
     private String username;
     private String password;
     private Integer status;
-    private String avator;
+    private String avatar;
     private String nick;
     private String email;
-    private String phone;
-    private String address;
     private String role;
     private String extension;
     private Date createdAt;

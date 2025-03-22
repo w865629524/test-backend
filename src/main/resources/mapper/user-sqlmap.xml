@@ -2,16 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zq.backend.dao.UserDAO">
     <sql id="all_fields">
-        id, username, password, status, avator, email, nick, phone, address, role, extension, created_at, updated_at
+        id, username, password, status, avatar, email, nick, role, extension, created_at, updated_at
     </sql>
     <sql id="insert_fields">
-        username, password, status, avator, email, nick, phone, address, role, extension
+        username, password, status, avatar, email, nick, role, extension
     </sql>
 
     <!-- 插入用户 -->
     <insert id="insertUser" parameterType="com.zq.backend.object.data.UserDO">
         INSERT INTO `user` (<include refid="insert_fields"/>)
-        VALUES (#{username}, #{password}, #{status}, #{avator}, #{email}, #{nick}, #{phone}, #{address}, #{role}, #{extension})
+        VALUES (#{username}, #{password}, #{status}, #{avatar}, #{email}, #{nick}, #{role},
+        #{extension})
     </insert>
 
     <!-- 根据用户名查询用户 -->
@@ -31,20 +32,14 @@
     <update id="updateUser" parameterType="com.zq.backend.object.data.UserDO">
         UPDATE user
         SET updated_at = NOW()
-        <if test="avator != null">
-            ,avator = #{avator}
+        <if test="avatar != null">
+            ,avatar = #{avatar}
         </if>
         <if test="nick != null">
             ,nick = #{nick}
         </if>
         <if test="email != null">
             ,email = #{email}
-        </if>
-        <if test="phone != null">
-            ,phone = #{phone}
-        </if>
-        <if test="address != null">
-            ,address = #{address}
         </if>
         WHERE username = #{username}
         AND status = 0
@@ -73,12 +68,6 @@
         </if>
         <if test="email != null">
             and email like CONCAT('%', #{email}, '%')
-        </if>
-        <if test="phone != null">
-            and phone like CONCAT('%', #{phone}, '%')
-        </if>
-        <if test="address != null">
-            and address like CONCAT('%', #{address}, '%')
         </if>
         <if test="isAdmin == true">
             <!--@ignoreSql-->

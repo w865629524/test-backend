@@ -17,10 +17,8 @@ public class RegisterPararm extends BaseParam implements Serializable {
     private String username;
     private String password;
     private String nick;
-    private String avator;
+    private String avatar;
     private String email;
-    private String phone;
-    private String address;
 
     @Override
     public void checkAndRevise() {
