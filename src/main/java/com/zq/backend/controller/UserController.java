@@ -31,48 +31,48 @@ public class UserController extends BaseController {
     @Auth(needLogin = false, requireRole = RoleTypeEnum.STRANGER)
     @PostMapping("/register")
     public BaseResult<LoginResult> register(@RequestBody RegisterPararm param) {
-        return doHandle(() -> userService.create(param), param);
+        return doHandle(() -> userService.create(param), "/api/user/register", param);
     }
 
     @Auth(needLogin = false, requireRole = RoleTypeEnum.STRANGER)
     @PostMapping("/login")
     public BaseResult<LoginResult> login(@RequestBody LoginParam param) {
-        return doHandle(() -> userService.doLogin(param), param);
+        return doHandle(() -> userService.doLogin(param), "/api/user/login", param);
     }
 
     @Auth(requireRole = RoleTypeEnum.USER)
     @RequestMapping(value="/logout", method={RequestMethod.GET, RequestMethod.POST})
     public BaseResult<Void> logout() {
-        return doHandle(() -> userService.doLogout(getUsername()));
+        return doHandle(() -> userService.doLogout(getUsername()), "/api/user/logout");
     }
 
     @Auth(requireRole = RoleTypeEnum.USER)
     @PostMapping("/update")
     public BaseResult<UserVO> update(@RequestBody UpdateUserParam param) {
-        return doHandle(() -> userService.updateUser(param, getUsername()));
+        return doHandle(() -> userService.updateUser(param, getUsername()), "/api/user/update", param);
     }
 
     @Auth(requireRole = RoleTypeEnum.USER)
     @PostMapping("/update/password")
     public BaseResult<LoginResult> updatePassword(@RequestBody UpdateUserPasswordParam param) {
-        return doHandle(() -> userService.updatePassword(param, getUsername()));
+        return doHandle(() -> userService.updatePassword(param, getUsername()), "/api/user/updatePassword", param);
     }
 
     @Auth(requireRole = RoleTypeEnum.USER)
     @RequestMapping(value="/info", method={RequestMethod.GET, RequestMethod.POST})
     public BaseResult<UserVO> info() {
-        return doHandle(() -> userService.getUserInfo(getUsername()));
+        return doHandle(() -> userService.getUserInfo(getUsername()), "/api/user/info");
     }
 
     @Auth(requireRole = RoleTypeEnum.ADMIN)
     @PostMapping("/list")
     public BaseResult<List<UserVO>> list(@RequestBody ListUserParam param) {
-        return doHandle(() -> userService.listUser(param));
+        return doHandle(() -> userService.listUser(param), "/api/user/list", param);
     }
 
     @Auth(requireRole = RoleTypeEnum.ADMIN)
     @PostMapping("/addAdmin")
     public BaseResult<Void> addAdmin(@RequestBody AddAdminParam param) {
-        return doHandle(() -> userService.addAdmin(param));
+        return doHandle(() -> userService.addAdmin(param), "/api/user/addAdmin", param);
     }
 }

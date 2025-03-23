@@ -23,6 +23,7 @@ import com.zq.backend.object.results.LoginResult;
 import com.zq.backend.object.vo.UserVO;
 import com.zq.backend.repository.UserRepository;
 import com.zq.backend.service.UserService;
+import com.zq.backend.utils.LogUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class UserServiceImpl implements UserService {
             return doLogin(loginParam);
         } catch (BaseException e) {
             if(ErrorEnum.USER_NOT_EXISTS.getErrorCode().equals(e.getErrorCode())) {
-                log.error("[UserServiceImpl][create][logMsg: created user not exists][param:{}], e:", JSON.toJSONString(param), e);
+                LogUtil.error(log, "created user not exists", e, () -> param);
                 ExceptionUtil.throwException(ErrorEnum.UNKNOWN_ERROR);
             }
         }
@@ -117,7 +118,7 @@ public class UserServiceImpl implements UserService {
         }
         int updated = userRepository.updateExtension(username, extension);
         if(updated <= 0) {
-            log.error("[UserServiceImpl][doLogout][logMsg: update failed][username:{}]", username);
+            LogUtil.error(log, "logout failed", () -> username);
             ExceptionUtil.throwException(ErrorEnum.UNKNOWN_ERROR);
         }
         return null;
@@ -176,7 +177,7 @@ public class UserServiceImpl implements UserService {
         }
         int updated = userRepository.updateRole(userDTO.getUsername(), RoleTypeEnum.ADMIN);
         if(updated <= 0) {
-            log.error("[UserServiceImpl][addAdmin][logMsg: update failed][param:{}]", JSON.toJSONString(param));
+            LogUtil.error(log, "update failed", () -> param);
             ExceptionUtil.throwException(ErrorEnum.UNKNOWN_ERROR);
         }
         return null;

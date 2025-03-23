@@ -61,7 +61,12 @@ jobs:
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> ${{ vars.APPLICATION_ENV_PATH }}
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> ${{ vars.APPLICATION_ENV_PATH }}
             echo "LOGGING_FILE_PATH=${{ vars.LOGGING_FILE_PATH }}" >> ${{ vars.APPLICATION_ENV_PATH }}
-            
+            echo "OSS_ACCESS_KEY_ID=${{ secrets.OSS_ACCESS_KEY_ID }} >> ${{ vars.APPLICATION_ENV_PATH }}
+            echo "OSS_ACCESS_KEY_SECRET=${{ secrets.OSS_ACCESS_KEY_SECRET }} >> ${{ vars.APPLICATION_ENV_PATH }}
+            echo "OSS_REGION=${{ vars.OSS_REGION }} >> ${{ vars.APPLICATION_ENV_PATH }}
+            echo "OSS_ENDPOINT=${{ vars.OSS_ENDPOINT }} >> ${{ vars.APPLICATION_ENV_PATH }}
+            echo "OSS_BUCKET_NAME=${{ vars.OSS_BUCKET_NAME }} >> ${{ vars.APPLICATION_ENV_PATH }}            
+
             # 启动服务
             sudo systemctl start ${{ vars.DEPLOY_SERVICE_NAME }}
           

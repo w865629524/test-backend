@@ -3,6 +3,7 @@ package com.zq.backend.cache;
 import com.zq.backend.object.common.ErrorEnum;
 import com.zq.backend.object.common.ExceptionUtil;
 import com.zq.backend.object.common.ParamChecker;
+import com.zq.backend.utils.LogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.Cache;
@@ -69,7 +70,7 @@ public class ThreadLocalCache implements Cache {
             }
             return loadedValue;
         } catch (Exception e) {
-            log.error("[ThreadLocalCache][get][logMsg: loadValue error][key:{}], e:", key, e);
+            LogUtil.error(log, "loadValue error", e, () -> key);
             ExceptionUtil.throwException(ErrorEnum.UNKNOWN_ERROR);
             return null;
         }
