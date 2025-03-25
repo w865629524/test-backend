@@ -6,9 +6,12 @@ import com.zq.backend.object.common.BaseResult;
 import com.zq.backend.object.common.ErrorEnum;
 import com.zq.backend.object.common.ParamChecker;
 import com.zq.backend.object.params.BaseParam;
+import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.Objects;
 
 @Slf4j
 public abstract class BaseController {
@@ -39,12 +42,22 @@ public abstract class BaseController {
         }
     }
 
+    ThreadLocal<String> usernameThreadLocal = new ThreadLocal<>();
+
     protected String getUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName();
+        if(StringUtils.isBlank(usernameThreadLocal.get())) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            usernameThreadLocal.set(authentication.getName());
+        }
+        return usernameThreadLocal.get();
     }
 
+    private static String className = null;
+
     protected String getClassName() {
-        return this.getClass().getSimpleName();
+        if(Objects.nonNull(className)) {
+            return className;
+        }
+        return className = this.getClass().getSimpleName();
     }
 }

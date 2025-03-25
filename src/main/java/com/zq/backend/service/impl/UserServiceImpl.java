@@ -6,7 +6,6 @@ import com.zq.backend.converter.ParamConverter;
 import com.zq.backend.converter.VOConverter;
 import com.zq.backend.jwt.JwtUtil;
 import com.zq.backend.object.enums.RoleTypeEnum;
-import com.zq.backend.object.common.BaseException;
 import com.zq.backend.object.common.ErrorEnum;
 import com.zq.backend.object.common.ExceptionUtil;
 import com.zq.backend.object.data.UserDO;
@@ -19,19 +18,23 @@ import com.zq.backend.object.params.LoginParam;
 import com.zq.backend.object.params.RegisterPararm;
 import com.zq.backend.object.params.UpdateUserParam;
 import com.zq.backend.object.params.UpdateUserPasswordParam;
-import com.zq.backend.object.results.LoginResult;
 import com.zq.backend.object.vo.UserVO;
 import com.zq.backend.repository.UserRepository;
 import com.zq.backend.service.UserService;
 import com.zq.backend.utils.LogUtil;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Date;
 import java.util.List;
@@ -51,7 +54,7 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
 
     @Override
-    public LoginResult create(RegisterPararm param) {
+    public UserVO create(RegisterPararm param) {
         // 创建用户
         UserDTOWithPassword userDTO = ParamConverter.INSTANCE.toUserDTOWithPassword(param);
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
@@ -59,23 +62,14 @@ public class UserServiceImpl implements UserService {
         userRepository.create(userDTO);
 
         // 查询用户
-        try {
-            LoginParam loginParam = new LoginParam();
-            loginParam.setUsername(param.getUsername());
-            loginParam.setPassword(param.getPassword());
-            return doLogin(loginParam);
-        } catch (BaseException e) {
-            if(ErrorEnum.USER_NOT_EXISTS.getErrorCode().equals(e.getErrorCode())) {
-                LogUtil.error(log, "created user not exists", e, () -> param);
-                ExceptionUtil.throwException(ErrorEnum.UNKNOWN_ERROR);
-            }
-        }
-
-        return null;
+        LoginParam loginParam = new LoginParam();
+        loginParam.setUsername(param.getUsername());
+        loginParam.setPassword(param.getPassword());
+        return doLogin(loginParam);
     }
 
     @Override
-    public LoginResult doLogin(LoginParam param) {
+    public UserVO doLogin(LoginParam param) {
         String username = param.getUsername();
         String password = param.getPassword();
 
@@ -84,29 +78,37 @@ public class UserServiceImpl implements UserService {
         if(!authentication.isAuthenticated()) {
             ExceptionUtil.throwException(ErrorEnum.WRONG_PASSWORD);
         }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDTO userDTO = userRepository.getByUserName(username);
-        return generateTokenAndGetLoginResult(authentication, userDTO);
+        return VOConverter.INSTANCE.toUserVO(userDTO);
     }
 
-    private LoginResult generateTokenAndGetLoginResult(Authentication authentication, UserDTO userDTO) {
-        UserExtension extension = userDTO.getExtension();
-        if(Objects.isNull(extension)) {
-            extension = new UserExtension();
-        }
-        if(Objects.isNull(extension.getJwtVersion())) {
-            extension.setJwtVersion(0);
-            userRepository.updateExtension(userDTO.getUsername(), extension);
-        }
-        Date now = new Date();
-        long jwtTTL = Constant.JWT_TTL;
-        String token = JwtUtil.createToken(authentication.getName(), extension.getJwtVersion(), now, jwtTTL);
+    private void createToken(UserDTO userDTO) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if(Objects.nonNull(requestAttributes)) {
+            HttpServletResponse response = requestAttributes.getResponse();
+            if(Objects.nonNull(response)) {
+                UserExtension extension = userDTO.getExtension();
+                if(Objects.isNull(extension)) {
+                    extension = new UserExtension();
+                }
+                if(Objects.isNull(extension.getJwtVersion())) {
+                    extension.setJwtVersion(0);
+                    userRepository.updateExtension(userDTO.getUsername(), extension);
+                }
+                Date now = new Date();
+                long jwtTTL = Constant.JWT_TTL;
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                String token = JwtUtil.createToken(authentication.getName(), extension.getJwtVersion(), now, jwtTTL);
 
-        LoginResult loginResult = new LoginResult();
-        loginResult.setToken(token);
-        loginResult.setTokenExpire(new Date(now.getTime() + jwtTTL));
-        loginResult.setUserInfo(VOConverter.INSTANCE.toUserVO(userDTO));
-        return loginResult;
+                Cookie cookie = new Cookie(Constant.JWT_TOKEN_KEY, token);
+                cookie.setHttpOnly(true);
+//                cookie.setSecure(true);
+                cookie.setMaxAge((int)(jwtTTL / Constant.ONE_SECOND_MILLS));
+                response.addCookie(cookie);
+            }
+        }
     }
 
     @Override
@@ -140,7 +142,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginResult updatePassword(UpdateUserPasswordParam param, String username) {
+    public UserVO updatePassword(UpdateUserPasswordParam param, String username) {
         // 检查老密码是否匹配
         UserDTOWithPassword userDTOWithPassword = userRepository.getWithPasswordByUserName(username);
         if(!passwordEncoder.matches(param.getOldPassword(), userDTOWithPassword.getPassword())) {
@@ -152,9 +154,10 @@ public class UserServiceImpl implements UserService {
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, param.getNewPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDTO userDTO = userRepository.getByUserName(username);
-        return generateTokenAndGetLoginResult(authentication, userDTO);
+        return VOConverter.INSTANCE.toUserVO(userDTO);
     }
 
     @Override

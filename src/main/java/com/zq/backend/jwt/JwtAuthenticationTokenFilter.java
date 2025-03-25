@@ -1,6 +1,7 @@
 package com.zq.backend.jwt;
 
 import com.zq.backend.Constant;
+import com.zq.backend.utils.HTTPUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
@@ -30,7 +31,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = request.getHeader(Constant.JWT_HEADER_KEY);
+        String token = HTTPUtil.getValueFromCookies(request, Constant.JWT_TOKEN_KEY);
         if (Objects.nonNull(token) && token.startsWith(Constant.JWT_TOKEN_PREFIX)) {
             token = token.substring(Constant.JWT_TOKEN_PREFIX.length());
             Claims claims = JwtUtil.parseToken(token);

@@ -9,7 +9,6 @@ import com.zq.backend.object.params.LoginParam;
 import com.zq.backend.object.params.RegisterPararm;
 import com.zq.backend.object.params.UpdateUserParam;
 import com.zq.backend.object.params.UpdateUserPasswordParam;
-import com.zq.backend.object.results.LoginResult;
 import com.zq.backend.object.vo.UserVO;
 import com.zq.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +29,13 @@ public class UserController extends BaseController {
 
     @Auth(needLogin = false, requireRole = RoleTypeEnum.STRANGER)
     @PostMapping("/register")
-    public BaseResult<LoginResult> register(@RequestBody RegisterPararm param) {
+    public BaseResult<UserVO> register(@RequestBody RegisterPararm param) {
         return doHandle(() -> userService.create(param), "/api/user/register", param);
     }
 
     @Auth(needLogin = false, requireRole = RoleTypeEnum.STRANGER)
     @PostMapping("/login")
-    public BaseResult<LoginResult> login(@RequestBody LoginParam param) {
+    public BaseResult<UserVO> login(@RequestBody LoginParam param) {
         return doHandle(() -> userService.doLogin(param), "/api/user/login", param);
     }
 
@@ -54,7 +53,7 @@ public class UserController extends BaseController {
 
     @Auth(requireRole = RoleTypeEnum.USER)
     @PostMapping("/update/password")
-    public BaseResult<LoginResult> updatePassword(@RequestBody UpdateUserPasswordParam param) {
+    public BaseResult<UserVO> updatePassword(@RequestBody UpdateUserPasswordParam param) {
         return doHandle(() -> userService.updatePassword(param, getUsername()), "/api/user/updatePassword", param);
     }
 

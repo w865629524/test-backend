@@ -16,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -54,28 +53,5 @@ public class AuthAspect {
         }
 
         return pjp.proceed();
-    }
-
-    private String extractUsername(Object[] args) {
-        for(Object arg : args) {
-            if(Objects.isNull(arg)) {
-                continue;
-            }
-            if(arg instanceof String && arg.getClass().isAnnotationPresent(Username.class)) {
-                return (String) arg;
-            }
-            Class<?> clazz = arg.getClass();
-            for (Field field : clazz.getDeclaredFields()) {
-                if(field.isAnnotationPresent(Username.class)) {
-                    field.setAccessible(true);
-                    try {
-                        return (String) field.get(arg);
-                    } catch (IllegalAccessException e) {
-                        return null;
-                    }
-                }
-            }
-        }
-        return null;
     }
 }
