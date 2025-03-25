@@ -16,13 +16,10 @@ public class JwtUtil {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    public static String createToken(String subject, int jwtVersion) {
+    public static String createToken(String subject, int jwtVersion, Date now, long ttlMillis) {
         SecretKey secretKey = generalKey();
 
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-        long ttlMillis = Constant.JWT_TTL;
-        long expMillis = nowMillis + ttlMillis;
+        long expMillis = now.getTime() + ttlMillis;
         Date expDate = new Date(expMillis);
 
         JwtBuilder builder = Jwts.builder()

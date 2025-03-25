@@ -1,6 +1,6 @@
 package com.zq.backend.service.impl;
 
-import com.alibaba.fastjson2.JSON;
+import com.zq.backend.Constant;
 import com.zq.backend.converter.DOConverter;
 import com.zq.backend.converter.ParamConverter;
 import com.zq.backend.converter.VOConverter;
@@ -33,6 +33,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -85,18 +86,25 @@ public class UserServiceImpl implements UserService {
         }
 
         UserDTO userDTO = userRepository.getByUserName(username);
+        return generateTokenAndGetLoginResult(authentication, userDTO);
+    }
+
+    private LoginResult generateTokenAndGetLoginResult(Authentication authentication, UserDTO userDTO) {
         UserExtension extension = userDTO.getExtension();
         if(Objects.isNull(extension)) {
             extension = new UserExtension();
         }
         if(Objects.isNull(extension.getJwtVersion())) {
             extension.setJwtVersion(0);
-            userRepository.updateExtension(username, extension);
+            userRepository.updateExtension(userDTO.getUsername(), extension);
         }
-        String token = JwtUtil.createToken(authentication.getName(), extension.getJwtVersion());
+        Date now = new Date();
+        long jwtTTL = Constant.JWT_TTL;
+        String token = JwtUtil.createToken(authentication.getName(), extension.getJwtVersion(), now, jwtTTL);
 
         LoginResult loginResult = new LoginResult();
         loginResult.setToken(token);
+        loginResult.setTokenExpire(new Date(now.getTime() + jwtTTL));
         loginResult.setUserInfo(VOConverter.INSTANCE.toUserVO(userDTO));
         return loginResult;
     }
@@ -142,16 +150,11 @@ public class UserServiceImpl implements UserService {
         userRepository.updatePassword(username, encodedPassword);
         doLogout(username);
 
-        UserDTO userDTO = userRepository.getByUserName(username);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, param.getNewPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        UserExtension extension = userDTO.getExtension();
-        String token = JwtUtil.createToken(authentication.getName(), extension.getJwtVersion());
 
-        LoginResult loginResult = new LoginResult();
-        loginResult.setToken(token);
-        loginResult.setUserInfo(VOConverter.INSTANCE.toUserVO(userDTO));
-        return loginResult;
+        UserDTO userDTO = userRepository.getByUserName(username);
+        return generateTokenAndGetLoginResult(authentication, userDTO);
     }
 
     @Override
