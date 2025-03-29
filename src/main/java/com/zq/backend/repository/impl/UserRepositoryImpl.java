@@ -33,7 +33,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     @CacheEvict(value=CACHE_NAME, key="#userDTO.username")
-    public void create(UserDTOWithPassword userDTO) {
+    public int create(UserDTOWithPassword userDTO) {
         ParamChecker.checkNotNull(userDTO, "userDTO");
         if(StringUtils.isBlank(userDTO.getNick())) {
             userDTO.setNick(userDTO.getUsername());
@@ -48,7 +48,7 @@ public class UserRepositoryImpl implements UserRepository {
         }
 
         UserDO userDO = DOConverter.INSTANCE.toUserDO(userDTO);
-        userDAO.insertUser(userDO);
+        return userDAO.insertUser(userDO);
     }
 
     @Override

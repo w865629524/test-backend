@@ -7,6 +7,7 @@ import com.zq.backend.object.params.GetUploadInfoParam;
 import com.zq.backend.object.results.UploadInfo;
 import com.zq.backend.service.OSSService;
 import jakarta.annotation.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public class FileController extends BaseController {
 
     @Auth(needLogin = false, requireRole = RoleTypeEnum.STRANGER)
     @PostMapping("/upload/info")
-    public BaseResult<UploadInfo> getUploadInfo(@RequestBody GetUploadInfoParam param) {
+    public ResponseEntity<BaseResult<UploadInfo>> getUploadInfo(@RequestBody GetUploadInfoParam param) {
         return doHandle(() -> ossService.getUploadInfo(param), "/api/file/upload/info", param);
     }
 }

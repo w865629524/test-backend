@@ -12,19 +12,23 @@ import java.util.List;
 
 public interface UserService {
 
-    UserVO create(RegisterPararm param);
+    void create(RegisterPararm param);
 
     UserVO doLogin(LoginParam param);
 
-    Void doLogout(String username);
+    void createToken(String username);
 
-    UserVO updateUser(UpdateUserParam param, String username);
+    void cancelToken();
 
-    UserVO updatePassword(UpdateUserPasswordParam param, String username);
+    void doLogout(String username);
+
+    UserVO updateUser(UpdateUserParam param);
+
+    void updatePassword(UpdateUserPasswordParam param);
 
     UserVO getUserInfo(String username);
 
     List<UserVO> listUser(ListUserParam param);
 
-    Void addAdmin(AddAdminParam param);
+    void addAdmin(AddAdminParam param);
 }

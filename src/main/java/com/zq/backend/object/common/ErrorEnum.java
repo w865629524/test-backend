@@ -17,6 +17,8 @@ public enum ErrorEnum {
     UNSAFE_PASSWORD("10007", "不安全的密码"),
     ILLEGAL_USERNAME("10008", "用户名非法"),
     OSS_ERROR("10009", "上传下载服务异常"),
+    DB_ERROR("10010", "数据库错误"),
+    DEV_ERROR("99998", "未知错误"),
     UNKNOWN_ERROR("99999", "未知错误"),
     ;
 

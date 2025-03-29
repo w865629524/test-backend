@@ -10,7 +10,7 @@ import com.zq.backend.object.params.ListUserParam;
 import java.util.List;
 
 public interface UserRepository {
-    void create(UserDTOWithPassword userDTO);
+    int create(UserDTOWithPassword userDTO);
 
     UserDTO getByUserName(String username);
 

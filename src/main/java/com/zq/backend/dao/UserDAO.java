@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface UserDAO {
 
-    void insertUser(UserDO userDO);
+    int insertUser(UserDO userDO);
 
     UserDO getByUserName(@Param("username") String username);
 
