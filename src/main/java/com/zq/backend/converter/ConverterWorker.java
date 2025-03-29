@@ -1,6 +1,7 @@
 package com.zq.backend.converter;
 
 import com.alibaba.fastjson2.JSON;
+import com.zq.backend.object.dto.UserExtension;
 import com.zq.backend.object.enums.RoleTypeEnum;
 import com.zq.backend.object.enums.UserStatusEnum;
 import org.mapstruct.Named;
@@ -30,6 +31,14 @@ public class ConverterWorker {
             return null;
         }
         return RoleTypeEnum.parse(str);
+    }
+
+    @Named("parseUserExtension")
+    public UserExtension parseUserExtension(String str) {
+        if (Objects.isNull(str)) {
+            return null;
+        }
+        return JSON.parseObject(str, UserExtension.class);
     }
 
     @Named("checkIsAdmin")

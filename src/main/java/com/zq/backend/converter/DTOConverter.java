@@ -17,7 +17,7 @@ public interface DTOConverter {
 
     @Mapping(target = "role", source = "role", qualifiedByName = "parseRoleTypeEnum")
     @Mapping(target = "status", source = "status", qualifiedByName = "parseUserStatusEnum")
-    @Mapping(target = "extension", ignore = true)
+    @Mapping(target = "extension", source = "extension", qualifiedByName = "parseUserExtension")
     @Named("toUserDTO")
     UserDTO toUserDTO(UserDO userDO);
 
@@ -26,7 +26,7 @@ public interface DTOConverter {
 
     @Mapping(target = "role", source = "role", qualifiedByName = "parseRoleTypeEnum")
     @Mapping(target = "status", source = "status", qualifiedByName = "parseUserStatusEnum")
-    @Mapping(target = "extension", ignore = true)
+    @Mapping(target = "extension", source = "extension", qualifiedByName = "parseUserExtension")
     @Named("toUserDTOWithPassword")
     UserDTOWithPassword toUserDTOWithPassword(UserDO userDO);
 }

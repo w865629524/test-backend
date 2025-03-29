@@ -27,6 +27,7 @@ import com.zq.backend.utils.LogUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +36,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -105,10 +107,18 @@ public class UserServiceImpl implements UserService {
         String token = JwtUtil.createToken(authentication.getName(), extension.getJwtVersion(), now, jwtTTL);
 
         ResponseCookie responseCookie = ResponseCookie.from(Constant.JWT_TOKEN_KEY, token)
+                // 禁止JavaScript访问Cookie，防止XSS攻击
                 .httpOnly(true)
-                .secure(true)
+                // 只允许通过HTTPS传输，防止中间人攻击
+//                .secure(true)
+                // 指定Cookie的路径范围
                 .path("/")
-                .maxAge(jwtTTL / Constant.ONE_SECOND_MILLS)
+                // 控制Cookie是否可以在跨站请求中发送，防止CSRF攻击
+                .sameSite(Cookie.SameSite.STRICT.attributeValue())
+                // 指定Cookie的有效期（秒）
+                .maxAge(Duration.ofMillis(jwtTTL))
+                // 指定Cookie的作用域（域名范围）
+//                .domain()
                 .build();
         ControllerContext.data().addCookie(responseCookie);
     }
@@ -116,9 +126,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void cancelToken() {
         ResponseCookie responseCookie = ResponseCookie.from(Constant.JWT_TOKEN_KEY, "")
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
                 .maxAge(0)
                 .build();
         ControllerContext.data().addCookie(responseCookie);
